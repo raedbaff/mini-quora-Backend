@@ -1,4 +1,10 @@
-import { IsEmail, IsString, MaxLength, MinLength } from 'class-validator';
+import {
+  IsEmail,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 
 export class user {
   @IsString()
@@ -11,6 +17,22 @@ export class user {
   email: string;
 
   @MinLength(8)
+  password: string;
+}
+export class updateUser {
+  @IsString()
+  @MinLength(4)
+  @MaxLength(20)
+  @IsOptional()
+  username: string;
+
+  @IsString()
+  @IsEmail()
+  @IsOptional()
+  email: string;
+
+  @MinLength(8)
+  @IsOptional()
   password: string;
 }
 export class userLogin {

@@ -3,18 +3,21 @@ import {
   Body,
   ConflictException,
   Controller,
+  Delete,
   Get,
   HttpException,
   HttpStatus,
   InternalServerErrorException,
   Param,
+  Patch,
   Post,
   Put,
+  Request,
   UnauthorizedException,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { user, userLogin } from './Validator/user';
+import { updateUser, user, userLogin } from './Validator/user';
 import { UserService } from './user.service';
 import { Public } from 'src/decorators/global.decorator';
 import { DataNotFound } from 'src/exceptions/not_found';
@@ -23,6 +26,7 @@ import { DataConflictException } from 'src/exceptions/conflict';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileService } from 'src/file/file.service';
 import { idValidator } from './Validator/idValidator';
+import { NotAllowedException } from 'src/exceptions/not_allowed';
 
 @Controller('user')
 export class UserController {
@@ -32,7 +36,11 @@ export class UserController {
   ) {}
   @Get()
   async getUser() {
-    return 'User';
+    try {
+      return await this.userService.getAllUsers();
+    } catch (error) {
+      throw new InternalServerErrorException('Internal Server Error');
+    }
   }
   @Public()
   @Post()
@@ -73,13 +81,54 @@ export class UserController {
   async updateProfilePicture(
     file: Express.Multer.File,
     @Param() param: idValidator,
+    @Request() req,
   ) {
     try {
       const fileUrl = await this.fileService.saveFile(file);
-      return await this.userService.updateProfilePicture(param.id, fileUrl);
+      return await this.userService.updateProfilePicture(
+        req.userId,
+        param.id,
+        fileUrl,
+      );
     } catch (error) {
       if (error instanceof DataNotFound) {
         throw new HttpException(error.message, HttpStatus.NOT_FOUND);
+      }
+      throw new InternalServerErrorException('Internal Server Error');
+    }
+  }
+  @Delete('/:id')
+  async deleteAccount(@Param() param: idValidator, @Request() req) {
+    try {
+      await this.userService.deleteAccount(req.user.userId, param.id);
+    } catch (error) {
+      if (error instanceof DataNotFound) {
+        throw new HttpException(error.message, HttpStatus.NOT_FOUND);
+      }
+      if (error instanceof NotAllowedException) {
+        throw new UnauthorizedException(error.message);
+      }
+      throw new InternalServerErrorException('Internal Server Error');
+    }
+  }
+  @Patch('/:id')
+  async updateUserProfile(
+    @Param() param: idValidator,
+    @Body() data: updateUser,
+    @Request() req,
+  ) {
+    try {
+      return await this.userService.updateProfile(
+        req.user.userId,
+        param.id,
+        data,
+      );
+    } catch (error) {
+      if (error instanceof DataNotFound) {
+        throw new HttpException(error.message, HttpStatus.NOT_FOUND);
+      }
+      if (error instanceof NotAllowedException) {
+        throw new UnauthorizedException(error.message);
       }
       throw new InternalServerErrorException('Internal Server Error');
     }
