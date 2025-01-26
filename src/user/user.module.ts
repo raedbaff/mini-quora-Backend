@@ -6,6 +6,7 @@ import { AuthenticatedGuard } from 'src/auth/auth.guard';
 import { JwtStrategyService } from './jwt-strategy.service';
 import { UserService } from './user.service';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { BanGuard } from 'src/ban/ban.guard';
 
 @Module({
   controllers: [UserController],
@@ -14,6 +15,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
       provide: 'APP_GUARD',
       useClass: AuthenticatedGuard,
     },
+    BanGuard,
     UserService,
     PrismaService,
     JwtStrategyService,

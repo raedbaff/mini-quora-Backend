@@ -11,6 +11,7 @@ import { FileService } from './file/file.service';
 import { FileModule } from './file/file.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { QuestionModule } from './question/question.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { join } from 'path';
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads'),
     }),
+    QuestionModule,
   ],
   controllers: [AppController],
   providers: [

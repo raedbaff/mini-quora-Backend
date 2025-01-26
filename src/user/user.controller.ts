@@ -15,9 +15,10 @@ import {
   Request,
   UnauthorizedException,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { updateUser, user, userLogin } from './Validator/user';
+import { updateUser, user, userLogin } from '../Validator/user';
 import { UserService } from './user.service';
 import { Public } from 'src/decorators/global.decorator';
 import { DataNotFound } from 'src/exceptions/not_found';
@@ -25,8 +26,9 @@ import { InvalidCredentials } from 'src/exceptions/invalid_crendentials';
 import { DataConflictException } from 'src/exceptions/conflict';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileService } from 'src/file/file.service';
-import { idValidator } from './Validator/idValidator';
+import { idValidator } from '../Validator/idValidator';
 import { NotAllowedException } from 'src/exceptions/not_allowed';
+import { BanGuard } from 'src/ban/ban.guard';
 
 @Controller('user')
 export class UserController {
