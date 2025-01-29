@@ -12,3 +12,7 @@ export interface updateUserDto {
   email?: string;
   password?: string;
 }
+export interface banUserDto {
+  banReason: string;
+  banExpiresAt: Date;
+}

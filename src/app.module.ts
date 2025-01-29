@@ -12,6 +12,7 @@ import { FileModule } from './file/file.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { QuestionModule } from './question/question.module';
+import { AdminService } from './admin/admin.service';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { QuestionModule } from './question/question.module';
     LoggerService,
     JwtStrategyService,
     FileService,
+    AdminService,
   ],
 })
 export class AppModule {}

@@ -1,6 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateUserDto, LoginDTO, updateUserDto } from '../DTO/createUserDto';
+import {
+  banUserDto,
+  CreateUserDto,
+  LoginDTO,
+  updateUserDto,
+} from '../DTO/createUserDto';
 import * as bcrypt from 'bcrypt';
 import { DataNotFound } from 'src/exceptions/not_found';
 import { JwtService } from '@nestjs/jwt';
@@ -93,7 +98,6 @@ export class UserService {
   }
   async deleteAccount(connectedUserId: string, userId: string) {
     const user = await this.getUserById(userId);
-    console.log(connectedUserId, userId);
 
     if (user.id !== connectedUserId)
       throw new NotAllowedException(
@@ -136,6 +140,28 @@ export class UserService {
         profilePic: true,
         createdAt: true,
         updatedAt: true,
+      },
+    });
+  }
+  async banUser(userId: string, ban: banUserDto) {
+    await this.getUserById(userId);
+    return await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        isBanned: true,
+        banReason: ban.banReason,
+        banExpiresAt: ban.banExpiresAt,
+      },
+    });
+  }
+  async unbanUser(userId: string) {
+    await this.getUserById(userId);
+    return await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        isBanned: false,
+        banReason: null,
+        banExpiresAt: null,
       },
     });
   }

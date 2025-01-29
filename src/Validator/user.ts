@@ -1,4 +1,6 @@
+import { Type } from 'class-transformer';
 import {
+  IsDate,
   IsEmail,
   IsOptional,
   IsString,
@@ -41,4 +43,12 @@ export class userLogin {
 
   @MinLength(8)
   password: string;
+}
+export class ban {
+  @IsString()
+  @MaxLength(100)
+  banReason: string;
+  @IsDate()
+  @Type(() => Date)
+  banExpiresAt: Date;
 }

@@ -18,7 +18,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { updateUser, user, userLogin } from '../Validator/user';
+import { ban, updateUser, user, userLogin } from '../Validator/user';
 import { UserService } from './user.service';
 import { Public } from 'src/decorators/global.decorator';
 import { DataNotFound } from 'src/exceptions/not_found';
@@ -29,6 +29,7 @@ import { FileService } from 'src/file/file.service';
 import { idValidator } from '../Validator/idValidator';
 import { NotAllowedException } from 'src/exceptions/not_allowed';
 import { BanGuard } from 'src/ban/ban.guard';
+import { AdminGuard } from 'src/auth/admin/admin.guard';
 
 @Controller('user')
 export class UserController {
@@ -37,6 +38,7 @@ export class UserController {
     private readonly fileService: FileService,
   ) {}
   @Get()
+  @UseGuards(BanGuard)
   async getUser() {
     try {
       return await this.userService.getAllUsers();
@@ -131,6 +133,30 @@ export class UserController {
       }
       if (error instanceof NotAllowedException) {
         throw new UnauthorizedException(error.message);
+      }
+      throw new InternalServerErrorException('Internal Server Error');
+    }
+  }
+  @Patch('/ban/:id')
+  @UseGuards(AdminGuard)
+  async banUser(@Param() param: idValidator, @Body() data: ban) {
+    try {
+      return await this.userService.banUser(param.id, data);
+    } catch (error) {
+      if (error instanceof DataNotFound) {
+        throw new HttpException(error.message, HttpStatus.NOT_FOUND);
+      }
+      throw new InternalServerErrorException('Internal Server Error');
+    }
+  }
+  @Patch('/unban/:id')
+  @UseGuards(AdminGuard)
+  async unbanUser(@Param() param: idValidator) {
+    try {
+      return await this.userService.unbanUser(param.id);
+    } catch (error) {
+      if (error instanceof DataNotFound) {
+        throw new HttpException(error.message, HttpStatus.NOT_FOUND);
       }
       throw new InternalServerErrorException('Internal Server Error');
     }
