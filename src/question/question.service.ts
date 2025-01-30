@@ -21,20 +21,22 @@ export class QuestionService {
     return await this.prisma.question.findMany();
   }
   async getQuestionById(id: string) {
-    return await this.prisma.question.findUnique({
-      where: {
-        id,
-      },
-    });
-  }
-  async deleteQuestion(connectedUserId: string, userId: string, id: string) {
     const question = await this.prisma.question.findUnique({
       where: { id },
     });
     if (!question) {
       throw new DataNotFound(`Question with id ${id} not found`);
     }
-    if (question.userId !== connectedUserId && connectedUserId !== userId) {
+    return question;
+  }
+  async deleteQuestion(connectedUserId: string, id: string) {
+    const question = await this.prisma.question.findUnique({
+      where: { id },
+    });
+    if (!question) {
+      throw new DataNotFound(`Question with id ${id} not found`);
+    }
+    if (question.userId !== connectedUserId) {
       throw new NotAllowedException(
         'You are not allowed to delete this question',
       );
@@ -66,6 +68,19 @@ export class QuestionService {
         ...questionWithoutId,
         ...data,
       },
+    });
+  }
+  async getQuestionsByUserId(userId: string, page: number, limit: number) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new DataNotFound(`User with id ${userId} not found`);
+    }
+    return await this.prisma.question.findMany({
+      where: { userId },
+      skip: ((page ?? 1) - 1) * limit,
+      take: limit ?? 10,
     });
   }
 }

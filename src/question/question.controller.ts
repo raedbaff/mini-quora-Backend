@@ -1,11 +1,16 @@
 import {
+  BadRequestException,
   Body,
   Controller,
+  Delete,
+  ForbiddenException,
   Get,
   InternalServerErrorException,
+  NotFoundException,
   Param,
   Patch,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -62,6 +67,73 @@ export class QuestionController {
     try {
       return await this.questionService.getAllQuestions();
     } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+  @Get('/:id')
+  async getUserQuestions(
+    @Param() param: idValidator,
+    @Query('page') page: string,
+    @Query('numberOfQuestions') numberOfQuestions: string,
+  ) {
+    try {
+      if (!page || !numberOfQuestions) {
+        throw new BadRequestException(
+          'page and numberOfQuestions are required bro',
+        );
+      }
+      if (isNaN(parseInt(page)) || isNaN(parseInt(numberOfQuestions))) {
+        throw new BadRequestException(
+          'page and numberOfQuestions should be numbers',
+        );
+      }
+      if (parseInt(page) < 1 || parseInt(numberOfQuestions) < 1) {
+        throw new BadRequestException(
+          'page and numberOfQuestions should be greater than 0',
+        );
+      }
+
+      return await this.questionService.getQuestionsByUserId(
+        param.id,
+        parseInt(page),
+        parseInt(numberOfQuestions),
+      );
+    } catch (error) {
+      if (error instanceof DataNotFound) {
+        throw new NotFoundException(error.message);
+      }
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.message);
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+  @Get('/single/:id')
+  async getQuestionById(@Param() param: idValidator) {
+    try {
+      return await this.questionService.getQuestionById(param.id);
+    } catch (error) {
+      if (error instanceof DataNotFound) {
+        throw new NotFoundException(error.message);
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+  @Delete('/:id')
+  async deleteQuestion(@Request() req, @Param() param: idValidator) {
+    try {
+      const connectedUserId = req.user.userId;
+      return await this.questionService.deleteQuestion(
+        connectedUserId,
+        param.id,
+      );
+    } catch (error) {
+      if (error instanceof DataNotFound) {
+        throw new NotFoundException(error.message);
+      }
+      if (error instanceof NotAllowedException) {
+        throw new ForbiddenException(error.message);
+      }
       throw new InternalServerErrorException(error.message);
     }
   }
