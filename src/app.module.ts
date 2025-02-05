@@ -13,6 +13,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { QuestionModule } from './question/question.module';
 import { AdminService } from './admin/admin.service';
+import { AnswerModule } from './answer/answer.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { AdminService } from './admin/admin.service';
       rootPath: join(__dirname, '..', 'uploads'),
     }),
     QuestionModule,
+    AnswerModule,
   ],
   controllers: [AppController],
   providers: [
