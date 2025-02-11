@@ -14,6 +14,7 @@ import { join } from 'path';
 import { QuestionModule } from './question/question.module';
 import { AdminService } from './admin/admin.service';
 import { AnswerModule } from './answer/answer.module';
+import { UpvoteModule } from './upvote/upvote.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { AnswerModule } from './answer/answer.module';
     }),
     QuestionModule,
     AnswerModule,
+    UpvoteModule,
   ],
   controllers: [AppController],
   providers: [
