@@ -20,6 +20,7 @@ import { BanGuard } from 'src/ban/ban.guard';
 import { DataNotFound } from 'src/exceptions/not_found';
 import { NotAllowedException } from 'src/exceptions/not_allowed';
 import { idValidator } from 'src/Validator/idValidator';
+import { Public } from 'src/decorators/global.decorator';
 
 @Controller('question')
 export class QuestionController {
@@ -108,6 +109,7 @@ export class QuestionController {
       throw new InternalServerErrorException(error.message);
     }
   }
+  @Public()
   @Get('/single/:id')
   async getQuestionById(@Param() param: idValidator) {
     try {

@@ -21,6 +21,7 @@ import { LoggerService } from 'src/logger/logger.service';
 import { BanGuard } from 'src/ban/ban.guard';
 import { idValidator } from 'src/Validator/idValidator';
 import { NotAllowedException } from 'src/exceptions/not_allowed';
+import { Public } from 'src/decorators/global.decorator';
 
 @Controller('answer')
 export class AnswerController {
@@ -59,6 +60,7 @@ export class AnswerController {
       throw new InternalServerErrorException('Internal Server Error');
     }
   }
+  @Public()
   @Get('/:id')
   async getAnswer(@Param() param: idValidator) {
     try {
@@ -71,6 +73,7 @@ export class AnswerController {
       throw new InternalServerErrorException('Internal Server Error');
     }
   }
+  @Public()
   @Get('/question/:id')
   async getQuestionAnswers(
     @Param() param: idValidator,

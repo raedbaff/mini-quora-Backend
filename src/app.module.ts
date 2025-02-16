@@ -15,6 +15,7 @@ import { QuestionModule } from './question/question.module';
 import { AdminService } from './admin/admin.service';
 import { AnswerModule } from './answer/answer.module';
 import { UpvoteModule } from './upvote/upvote.module';
+import { ReplyModule } from './reply/reply.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { UpvoteModule } from './upvote/upvote.module';
     QuestionModule,
     AnswerModule,
     UpvoteModule,
+    ReplyModule,
   ],
   controllers: [AppController],
   providers: [
